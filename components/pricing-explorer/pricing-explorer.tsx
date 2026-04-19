@@ -20,6 +20,7 @@ import {
   ChevronsUpDown,
   SlidersHorizontal,
   X,
+  Info,
 } from 'lucide-react'
 
 type SortKey = 'displayName' | 'inputPricePer1M' | 'outputPricePer1M' | 'contextLength'
@@ -89,6 +90,49 @@ function SortIcon({ col, current, dir }: { col: SortKey; current: SortKey; dir: 
 
 
 const PAGE_SIZE = 12
+
+const UNIT_PRICE_DESCRIPTIONS = [
+  { modality: 'Text / Multimodal', unit: 'per 1M input tokens', example: 'e.g. $0.15 / 1M tokens' },
+  { modality: 'Audio (STT)',       unit: 'per minute of audio',  example: 'e.g. $0.006 / min' },
+  { modality: 'Image Generation',  unit: 'per image generated',  example: 'e.g. $0.040 / image' },
+  { modality: 'Video Generation',  unit: 'per second of video',  example: 'e.g. $0.050 / sec' },
+]
+
+function UnitPriceTooltip() {
+  const [open, setOpen] = useState(false)
+  return (
+    <span className="relative inline-flex items-center">
+      <button
+        type="button"
+        aria-label="Unit price explanation"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        className="ml-1.5 rounded text-muted-foreground/60 hover:text-muted-foreground focus:outline-none"
+      >
+        <Info className="h-3.5 w-3.5" />
+      </button>
+      {open && (
+        <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-lg border border-border bg-popover p-3 shadow-lg">
+          <p className="mb-2 text-xs font-semibold text-foreground">Unit price varies by modality</p>
+          <div className="space-y-2">
+            {UNIT_PRICE_DESCRIPTIONS.map(({ modality, unit, example }) => (
+              <div key={modality} className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-foreground">{modality}</span>
+                <span className="text-xs text-muted-foreground">
+                  {unit} <span className="text-muted-foreground/60">&mdash; {example}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* caret */}
+          <div className="absolute -top-1.5 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-l border-t border-border bg-popover" />
+        </div>
+      )}
+    </span>
+  )
+}
 
 function FilterSection({
   title,
@@ -423,7 +467,16 @@ export function PricingExplorer() {
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
                       <ThCell label="Model" sk="displayName" />
-                      <ThCell label="Input / Unit Price" sk="inputPricePer1M" />
+                      <th
+                    className="cursor-pointer select-none px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                    onClick={() => handleSort('inputPricePer1M')}
+                  >
+                    <span className="flex items-center">
+                      Input / Unit Price
+                      <SortIcon col="inputPricePer1M" current={sortKey} dir={sortDir} />
+                      <UnitPriceTooltip />
+                    </span>
+                  </th>
                       <ThCell label="Output / Resolution" sk="outputPricePer1M" />
                       <ThCell label="Context" sk="contextLength" />
                       <ThCell label="Cached / 1M" className="hidden md:table-cell" />

@@ -2,6 +2,7 @@
 
 import { type CalculatorConfig } from '@/lib/model-data'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
 
@@ -37,6 +38,31 @@ export function AdvancedControls({ config, onChange }: Props) {
         </div>
         <p className="text-xs text-muted-foreground">
           Simulates chain-of-thought or extended reasoning token usage.
+        </p>
+      </div>
+
+      {/* RAG Context */}
+      <div className="space-y-1.5">
+        <Label className="flex items-baseline justify-between">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            RAG Context
+          </span>
+          <span className="text-xs text-muted-foreground">tokens / turn</span>
+        </Label>
+        <Input
+          id="rag-tokens"
+          type="number"
+          min={0}
+          value={config.ragTokens}
+          onChange={(e) => {
+            const n = parseFloat(e.target.value)
+            onChange({ ragTokens: isFinite(n) ? Math.max(0, n) : 0 })
+          }}
+          className="h-9 text-sm"
+          placeholder="0"
+        />
+        <p className="text-xs text-muted-foreground">
+          Retrieved document chunks injected into each turn as additional input context.
         </p>
       </div>
 

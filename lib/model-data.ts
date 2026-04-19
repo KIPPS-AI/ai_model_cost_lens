@@ -79,15 +79,19 @@ export interface CalculatorConfig {
   taskType: TaskType
   aiComponents: AIComponent[]
   modelId: string
-  systemPromptTokens: number
-  userPromptTokens: number
-  assistantResponseTokens: number
-  conversationHistory: number
-  historyGrowthRate: number
-  enablePromptCaching: boolean
+  // Token parameters (stored as tokens, displayed as tokens in UI)
+  systemPromptChars: number        // system prompt size in tokens
+  avgUserInputChars: number        // user input tokens per message
+  avgResponseChars: number         // assistant response tokens per turn
+  conversationTurns: number        // number of back-and-forth turns
+  toolCallsPerConversation: number // tool calls per conversation
+  toolDescriptionChars: number     // tool schema size in tokens
+  ragTokens: number                // retrieved context tokens injected per turn
+  includeHistoryGrowth: boolean
+  usePromptCaching: boolean
   reasoningMultiplier: number
-  audioInputMinutes: number
-  audioOutputMinutes: number
+  avgCallDurationMinutes: number
+  wordsPerMinute: number
   sttModelId: string
   ttsModelId: string
   monthlyUsers: number
@@ -102,15 +106,19 @@ export const DEFAULT_CONFIG: CalculatorConfig = {
   taskType: 'chatbot',
   aiComponents: ['llm'],
   modelId: 'gpt-4o-mini',
-  systemPromptTokens: 500,
-  userPromptTokens: 150,
-  assistantResponseTokens: 300,
-  conversationHistory: 5,
-  historyGrowthRate: 0,
-  enablePromptCaching: false,
+  // Token parameters — values are in tokens
+  systemPromptChars: 3000,
+  avgUserInputChars: 20,
+  avgResponseChars: 40,
+  conversationTurns: 10,
+  toolCallsPerConversation: 2,
+  toolDescriptionChars: 300,
+  ragTokens: 0,
+  includeHistoryGrowth: false,
+  usePromptCaching: false,
   reasoningMultiplier: 1,
-  audioInputMinutes: 2,
-  audioOutputMinutes: 2,
+  avgCallDurationMinutes: 2,
+  wordsPerMinute: 150,
   sttModelId: 'whisper-1',
   ttsModelId: 'tts-1',
   monthlyUsers: 1000,
@@ -952,7 +960,7 @@ export const MODEL_PRICING: ModelPricing[] = [
     imageResolution: '1024×1024',
     description: 'Stable Diffusion 3.5 Large; improved typography and photorealism.',
   },
-  // ── Runway — Video ───────────────────────────────────────────────────────
+  // ── Runway — Video ──────────────────────────────────────────────────────��
   {
     id: 'runway-gen3-alpha-turbo',
     displayName: 'Gen-3 Alpha Turbo',

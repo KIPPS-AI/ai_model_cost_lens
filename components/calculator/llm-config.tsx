@@ -117,22 +117,25 @@ export function LLMConfig({ config, onChange }: Props) {
           <Field
             id="system-prompt"
             label="System Prompt"
-            hint="chars"
+            hint="tokens"
             value={config.systemPromptChars}
+            fallback={3000}
             onChange={(v) => onChange({ systemPromptChars: v })}
           />
           <Field
             id="user-input"
             label="User Input"
-            hint="chars / msg"
+            hint="tokens / msg"
             value={config.avgUserInputChars}
+            fallback={20}
             onChange={(v) => onChange({ avgUserInputChars: v })}
           />
           <Field
             id="response-length"
             label="Response Length"
-            hint="chars"
+            hint="tokens"
             value={config.avgResponseChars}
+            fallback={40}
             onChange={(v) => onChange({ avgResponseChars: v })}
           />
           <Field
@@ -140,7 +143,7 @@ export function LLMConfig({ config, onChange }: Props) {
             label="Conv. Turns"
             value={config.conversationTurns}
             min={1}
-            fallback={1}
+            fallback={10}
             onChange={(v) => onChange({ conversationTurns: Math.max(1, v) })}
           />
           <Field
@@ -148,13 +151,15 @@ export function LLMConfig({ config, onChange }: Props) {
             label="Tool Calls"
             hint="per conv."
             value={config.toolCallsPerConversation}
+            fallback={2}
             onChange={(v) => onChange({ toolCallsPerConversation: v })}
           />
           <Field
             id="tool-desc"
             label="Tool Schema"
-            hint="chars"
-            value={typeof config.toolDescriptionChars === 'number' ? config.toolDescriptionChars : 0}
+            hint="tokens"
+            value={typeof config.toolDescriptionChars === 'number' ? config.toolDescriptionChars : 300}
+            fallback={300}
             onChange={(v) => onChange({ toolDescriptionChars: v })}
           />
         </div>
